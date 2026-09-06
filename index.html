@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#090909">
+  <meta name="description" content="Setlist de concierto con búsqueda rápida de letras y modo prompter.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LetraLista">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>LetraLista · Setlist del concierto</title>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <a class="brand" href="#/" aria-label="LetraLista, ir al setlist">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>LetraLista</span>
+    </a>
+    <span class="concert-pill"><span aria-hidden="true">●</span> Carín León · Setlist</span>
+  </header>
+
+  <main id="contenido" tabindex="-1">
+    <section id="setlist-view" class="view" aria-labelledby="setlist-heading">
+      <div class="hero">
+        <p class="eyebrow">Noche de concierto</p>
+        <h1 id="setlist-heading">Tu setlist, lista para cantar.</h1>
+        <p class="hero-copy">Encuentra una canción al instante y ábrela en modo prompter.</p>
+      </div>
+
+      <div class="search-panel">
+        <label for="song-search">Buscar canción o artista</label>
+        <div class="search-field">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.35-4.35m2.35-5.65a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z"/></svg>
+          <input id="song-search" type="search" autocomplete="off" placeholder="Ej. Ruca, Matisse, Tequila…">
+          <button id="clear-search" class="icon-button" type="button" aria-label="Borrar búsqueda" hidden>×</button>
+        </div>
+        <div class="list-meta">
+          <p id="results-status" role="status" aria-live="polite">11 canciones</p>
+          <p>En el orden de la imagen</p>
+        </div>
+      </div>
+
+      <ol id="song-list" class="song-list" aria-label="Canciones del concierto"></ol>
+      <div id="empty-results" class="empty-state" hidden>
+        <span aria-hidden="true">♪</span>
+        <h2>No encontramos esa canción</h2>
+        <p>Prueba con otra palabra o busca por artista.</p>
+        <button id="reset-search" class="secondary-button" type="button">Ver todo el setlist</button>
+      </div>
+      <p class="crop-note">La imagen termina después de “Ruca”. Esta lista incluye todas las canciones legibles.</p>
+    </section>
+
+    <section id="prompter-view" class="view prompter-view" aria-labelledby="prompter-title" hidden>
+      <nav class="song-nav" aria-label="Navegación de canción">
+        <a class="back-link" href="#/" aria-label="Volver al setlist">← <span>Setlist</span></a>
+        <span id="prompter-position" class="song-position"></span>
+      </nav>
+
+      <div class="prompter-heading">
+        <div>
+          <p id="prompter-artist" class="eyebrow"></p>
+          <h1 id="prompter-title" tabindex="-1"></h1>
+        </div>
+        <button id="edit-lyrics" class="secondary-button compact" type="button">Editar letra</button>
+      </div>
+
+      <div id="lyrics-empty" class="lyrics-empty">
+        <span class="empty-note" aria-hidden="true">Aa</span>
+        <h2>Agrega la letra para usar el prompter</h2>
+        <p>Por derechos de autor, la app no publica letras. Pega una copia que tengas permiso de usar; se guarda solo en este navegador.</p>
+        <a id="web-lyrics-search" class="primary-button" target="_blank" rel="noopener noreferrer">Buscar letra en internet <span aria-hidden="true">↗</span></a>
+      </div>
+
+      <form id="lyrics-form" class="lyrics-form" hidden>
+        <label for="lyrics-editor">Pega aquí la letra</label>
+        <p id="lyrics-help">Usa saltos de línea entre versos. No se enviará a ningún servidor.</p>
+        <textarea id="lyrics-editor" rows="14" aria-describedby="lyrics-help" placeholder="Pega aquí la letra que usarás en el concierto…"></textarea>
+        <div class="form-actions">
+          <button id="cancel-edit" class="secondary-button" type="button">Cancelar</button>
+          <button class="primary-button" type="submit">Guardar y abrir prompter</button>
+        </div>
+      </form>
+
+      <div id="prompter-shell" class="prompter-shell" hidden>
+        <div id="prompter-toolbar" class="prompter-toolbar" aria-label="Controles del prompter">
+          <div class="toolbar-group" aria-label="Tamaño de letra">
+            <button id="font-decrease" class="tool-button" type="button" aria-label="Reducir tamaño de letra">A−</button>
+            <button id="font-increase" class="tool-button" type="button" aria-label="Aumentar tamaño de letra">A+</button>
+          </div>
+          <label class="speed-control" for="scroll-speed"><span>Velocidad</span><input id="scroll-speed" type="range" min="10" max="110" value="42" step="4"><output id="speed-value" for="scroll-speed">42</output></label>
+          <div class="toolbar-group">
+            <button id="prompter-reset" class="tool-button" type="button" aria-label="Volver al inicio">↺</button>
+            <button id="prompter-fullscreen" class="tool-button" type="button" aria-label="Ver en pantalla completa">⛶</button>
+          </div>
+          <button id="prompter-play" class="play-button" type="button"><span aria-hidden="true">▶</span><span>Iniciar</span></button>
+        </div>
+        <div id="prompter-scroll" class="prompter-scroll" tabindex="0" aria-label="Letra de la canción">
+          <div class="prompter-spacer" aria-hidden="true"></div>
+          <article id="lyrics-display" class="lyrics-display"></article>
+          <div class="prompter-spacer end" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <nav id="adjacent-songs" class="adjacent-songs" aria-label="Canciones anterior y siguiente"></nav>
+    </section>
+  </main>
+
+  <footer><p>Hecha para cantar, no para complicarte.</p><p class="legal">Las letras que agregues permanecen en tu dispositivo.</p></footer>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
