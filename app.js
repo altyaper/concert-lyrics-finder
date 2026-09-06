@@ -1,4 +1,5 @@
 import { songs, filterSongs, lyricSearchUrl, geniusSearchUrl } from './songs.js';
+import { createWakeLockManager } from './wake-lock.js';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = song => `letralista:lyrics:${song.id}`;
@@ -8,7 +9,10 @@ let scrolling = false;
 let animationFrame = null;
 let lastFrame = 0;
 let fontSize = getStoredFontSize();
-let wakeLock = null;
+const wakeLockManager = createWakeLockManager({
+  isActive: () => scrolling,
+  requestLock: () => navigator.wakeLock.request('screen')
+});
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -100,6 +104,7 @@ function showEditor() {
 }
 
 function showSong(song) {
+  stopScroll();
   currentSong = song;
   document.title = `${song.title} · LetraLista`;
   $('#setlist-view').hidden = true;
@@ -164,20 +169,19 @@ function applyFontSize() {
   try { localStorage.setItem('letralista:font-size', String(fontSize)); } catch { /* display still works */ }
 }
 
-async function keepAwake() {
-  if ('wakeLock' in navigator && !wakeLock) {
-    try { wakeLock = await navigator.wakeLock.request('screen'); } catch { /* progressive enhancement */ }
-  }
-}
-
-async function releaseWakeLock() {
-  if (wakeLock) { try { await wakeLock.release(); } catch { /* already released */ } wakeLock = null; }
-}
-
 function updatePlayButton() {
   const icon = element('span', '', scrolling ? 'Ⅱ' : '▶');
   icon.setAttribute('aria-hidden', 'true');
-  $('#prompter-play').replaceChildren(icon, element('span', '', scrolling ? 'Pausar' : 'Iniciar'));
+  const button = $('#prompter-play');
+  button.replaceChildren(icon, element('span', '', scrolling ? 'Pausar' : 'Iniciar'));
+  button.setAttribute('aria-pressed', String(scrolling));
+}
+
+function updateFullscreenButton() {
+  const button = $('#prompter-fullscreen');
+  const active = document.fullscreenElement === $('#prompter-shell');
+  button.setAttribute('aria-pressed', String(active));
+  button.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
 }
 
 function scrollFrame(time) {
@@ -192,14 +196,15 @@ function scrollFrame(time) {
 }
 
 function startScroll() {
-  scrolling = true; lastFrame = 0; updatePlayButton(); keepAwake();
+  scrolling = true; lastFrame = 0; updatePlayButton();
+  if ('wakeLock' in navigator) void wakeLockManager.acquire();
   animationFrame = requestAnimationFrame(scrollFrame);
 }
 
 function stopScroll() {
   scrolling = false; lastFrame = 0;
   if (animationFrame) cancelAnimationFrame(animationFrame);
-  animationFrame = null; updatePlayButton(); releaseWakeLock();
+  animationFrame = null; updatePlayButton(); void wakeLockManager.release();
 }
 
 $('#song-search').addEventListener('input', updateSearch);
@@ -227,7 +232,10 @@ $('#prompter-fullscreen').addEventListener('click', async () => {
     else await $('#prompter-shell').requestFullscreen();
   } catch { /* button remains harmless when unsupported */ }
 });
-document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && scrolling) keepAwake(); });
+document.addEventListener('fullscreenchange', updateFullscreenButton);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && scrolling && 'wakeLock' in navigator) void wakeLockManager.acquire();
+});
 window.addEventListener('hashchange', route);
 
 const initialQuery = new URL(location.href).searchParams.get('q') || '';
