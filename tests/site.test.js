@@ -16,6 +16,15 @@ test('page has accessible search, result status, main landmark and viewport supp
   assert.match(html, /Saltar al contenido/);
 });
 
+test('setlist omits the promotional intro block while retaining an accessible name', async () => {
+  const [html, sw] = await Promise.all([read('index.html'), read('sw.js')]);
+  assert.doesNotMatch(html, /Noche de concierto/i);
+  assert.doesNotMatch(html, /Tu setlist, lista para cantar\./i);
+  assert.doesNotMatch(html, /Encuentra una canción al instante y ábrela en modo prompter\./i);
+  assert.match(html, /<section id="setlist-view" class="view" aria-label="Setlist">/);
+  assert.match(sw, /CACHE = `\$\{CACHE_PREFIX\}v4`/);
+});
+
 test('PWA metadata and service worker preserve a public static-only offline shell', async () => {
   const [html, manifest, sw] = await Promise.all([read('index.html'), read('manifest.webmanifest'), read('sw.js')]);
   const parsed = JSON.parse(manifest);
