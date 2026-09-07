@@ -1,5 +1,6 @@
 import { songs, filterSongs, lyricSearchUrl, geniusSearchUrl } from './songs.js';
 import { createWakeLockManager } from './wake-lock.js';
+import { createFullscreenController } from './fullscreen.js';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = song => `letralista:lyrics:${song.id}`;
@@ -12,6 +13,24 @@ let fontSize = getStoredFontSize();
 const wakeLockManager = createWakeLockManager({
   isActive: () => scrolling,
   requestLock: () => navigator.wakeLock.request('screen')
+});
+const prompterShell = $('#prompter-shell');
+const fullscreenController = createFullscreenController({
+  applyActive: active => {
+    prompterShell.classList.toggle('is-fullscreen', active);
+    document.body.classList.toggle('prompter-focus-active', active);
+    updateFullscreenButton(active);
+  },
+  requestNative: () => {
+    const request = prompterShell.requestFullscreen || prompterShell.webkitRequestFullscreen;
+    if (!request) return false;
+    return Promise.resolve(request.call(prompterShell)).then(() => true);
+  },
+  exitNative: () => {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    return exit ? exit.call(document) : undefined;
+  },
+  hasNativeElement: () => (document.fullscreenElement || document.webkitFullscreenElement) === prompterShell
 });
 
 function element(tag, className, text) {
@@ -105,6 +124,7 @@ function showEditor() {
 
 function showSong(song) {
   stopScroll();
+  void fullscreenController.exit();
   currentSong = song;
   document.title = `${song.title} · LetraLista`;
   $('#setlist-view').hidden = true;
@@ -150,6 +170,7 @@ function adjacentLink(song, arrow, label) {
 
 function showSetlist() {
   stopScroll();
+  void fullscreenController.exit();
   document.title = 'LetraLista · Setlist del concierto';
   $('#prompter-view').hidden = true;
   $('#setlist-view').hidden = false;
@@ -177,9 +198,8 @@ function updatePlayButton() {
   button.setAttribute('aria-pressed', String(scrolling));
 }
 
-function updateFullscreenButton() {
+function updateFullscreenButton(active = fullscreenController.isActive()) {
   const button = $('#prompter-fullscreen');
-  const active = document.fullscreenElement === $('#prompter-shell');
   button.setAttribute('aria-pressed', String(active));
   button.setAttribute('aria-label', active ? 'Salir de pantalla completa' : 'Ver en pantalla completa');
 }
@@ -226,13 +246,9 @@ $('#font-increase').addEventListener('click', () => { fontSize = Math.min(70, fo
 $('#scroll-speed').addEventListener('input', event => { $('#speed-value').value = event.currentTarget.value; });
 $('#prompter-play').addEventListener('click', () => scrolling ? stopScroll() : startScroll());
 $('#prompter-reset').addEventListener('click', () => { stopScroll(); $('#prompter-scroll').scrollTo({ top: 0, behavior: 'smooth' }); });
-$('#prompter-fullscreen').addEventListener('click', async () => {
-  try {
-    if (document.fullscreenElement) await document.exitFullscreen();
-    else await $('#prompter-shell').requestFullscreen();
-  } catch { /* button remains harmless when unsupported */ }
-});
-document.addEventListener('fullscreenchange', updateFullscreenButton);
+$('#prompter-fullscreen').addEventListener('click', () => void fullscreenController.toggle());
+document.addEventListener('fullscreenchange', () => fullscreenController.handleNativeChange());
+document.addEventListener('webkitfullscreenchange', () => fullscreenController.handleNativeChange());
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && scrolling && 'wakeLock' in navigator) void wakeLockManager.acquire();
 });

@@ -112,8 +112,27 @@ h1 { margin: 0; max-width: 840px; font-family: Georgia, "Times New Roman", serif
 .lyrics-display[data-font-size="62"] { font-size: 62px; }
 .lyrics-display[data-font-size="66"] { font-size: 66px; }
 .lyrics-display[data-font-size="70"] { font-size: 70px; }
-.prompter-shell:fullscreen { border-radius: 0; border: 0; display: grid; grid-template-rows: auto 1fr; width: 100vw; height: 100vh; background: #000; }
-.prompter-shell:fullscreen .prompter-scroll { height: auto; }
+body.prompter-focus-active { overflow: hidden; }
+.prompter-shell.is-fullscreen,
+.prompter-shell:fullscreen,
+.prompter-shell:-webkit-full-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #000;
+}
+.prompter-shell.is-fullscreen .prompter-toolbar { padding-top: max(12px, env(safe-area-inset-top)); padding-right: max(12px, env(safe-area-inset-right)); padding-left: max(12px, env(safe-area-inset-left)); }
+.prompter-shell.is-fullscreen .prompter-scroll,
+.prompter-shell:fullscreen .prompter-scroll,
+.prompter-shell:-webkit-full-screen .prompter-scroll { height: auto; min-height: 0; }
 .adjacent-songs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
 .adjacent-link { position: relative; min-height: 94px; display: flex; flex-direction: column; gap: 6px; justify-content: center; padding: 18px 50px 18px 18px; text-decoration: none; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; }
 .adjacent-link:nth-child(2) { text-align: right; padding: 18px 18px 18px 50px; }

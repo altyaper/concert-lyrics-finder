@@ -5,7 +5,7 @@ import { readFile } from 'node:fs/promises';
 const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 
 test('switching songs stops auto-scroll before changing the current song', () => {
-  assert.match(app, /function showSong\(song\)\s*\{\s*stopScroll\(\);\s*currentSong = song;/);
+  assert.match(app, /function showSong\(song\)\s*\{\s*stopScroll\(\);\s*void fullscreenController\.exit\(\);\s*currentSong = song;/);
 });
 
 test('app delegates wake-lock lifecycle to the tested manager', () => {
