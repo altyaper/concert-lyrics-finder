@@ -7,12 +7,17 @@ A static, mobile-first concert setlist and browser-local lyrics prompter.
 - Includes the 11 songs readable in the supplied concert screenshot.
 - Filters instantly by song or artist, ignoring accents and case.
 - Opens prefilled lyric searches in Google or Genius.
-- Lets the user paste lyrics they have permission to use.
-- Stores pasted lyrics only in that browser's `localStorage`—there is no backend or database.
+- Loads authorized, publishable lyrics from `lyrics.json` at startup.
+- Lets the user paste local lyric edits, which override `lyrics.json` in that browser.
+- Stores pasted edits only in that browser's `localStorage`—there is no backend or database.
 - Presents saved lyrics as a large fullscreen prompter with font size, speed, play/pause, restart, fullscreen, and best-effort screen wake lock.
 - Installs as a PWA and retains the static app shell offline.
 
-The public app intentionally ships with no full song lyrics. Song lyrics are copyrighted, and this repository does not copy content from lyric sites.
+`lyrics.json` contains one entry for every song ID. Its values start empty and may contain only lyrics the publisher owns or has permission to publish. Because this is a public repository and website, text added there is public. The app does not scrape lyric sites.
+
+## Adding authorized lyrics
+
+Edit the matching value in `lyrics.json` and preserve line breaks with JSON `\n` escapes. The app validates IDs and text when it loads. Browser-local edits take priority over the bundled JSON value.
 
 ## Commands
 

@@ -2,9 +2,9 @@ import { access, readFile } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 
 execFileSync(process.execPath, [new URL('./generate-icons.js', import.meta.url).pathname], { stdio: 'inherit' });
-const files = ['index.html','styles.css','app.js','songs.js','wake-lock.js','fullscreen.js','sw.js','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'];
+const files = ['index.html','styles.css','app.js','songs.js','lyrics.js','lyrics.json','wake-lock.js','fullscreen.js','sw.js','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'];
 await Promise.all(files.map(file => access(new URL(`../${file}`, import.meta.url))));
-for (const file of ['app.js', 'songs.js', 'wake-lock.js', 'fullscreen.js', 'sw.js']) {
+for (const file of ['app.js', 'songs.js', 'lyrics.js', 'wake-lock.js', 'fullscreen.js', 'sw.js']) {
   execFileSync(process.execPath, ['--check', new URL(`../${file}`, import.meta.url).pathname], { stdio: 'inherit' });
 }
 const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');

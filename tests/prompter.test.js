@@ -15,7 +15,7 @@ test('prompter is static, browser-local and has complete reading controls', asyn
   assert.match(app, /wakeLock/);
 });
 
-test('lyrics are not bundled and the empty state supports paste plus web search', async () => {
+test('song metadata stays separate and the empty state supports paste plus web search', async () => {
   const [songs, html] = await Promise.all([read('songs.js'), read('index.html')]);
   assert.doesNotMatch(songs, /lyrics\s*:/);
   assert.match(html, /id="lyrics-editor"/);

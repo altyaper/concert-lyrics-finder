@@ -1,6 +1,7 @@
 import { songs, filterSongs, lyricSearchUrl, geniusSearchUrl } from './songs.js';
 import { createWakeLockManager } from './wake-lock.js';
 import { createFullscreenController } from './fullscreen.js';
+import { loadBundledLyrics, resolveLyrics } from './lyrics.js';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = song => `letralista:lyrics:${song.id}`;
@@ -10,6 +11,7 @@ let scrolling = false;
 let animationFrame = null;
 let lastFrame = 0;
 let fontSize = getStoredFontSize();
+let bundledLyrics = Object.create(null);
 const wakeLockManager = createWakeLockManager({
   isActive: () => scrolling,
   requestLock: () => navigator.wakeLock.request('screen')
@@ -99,7 +101,9 @@ function updateSearch() {
 }
 
 function getLyrics(song) {
-  try { return localStorage.getItem(storageKey(song)) || ''; } catch { return ''; }
+  let stored = null;
+  try { stored = localStorage.getItem(storageKey(song)); } catch { /* use bundled lyrics */ }
+  return resolveLyrics(song.id, stored, bundledLyrics);
 }
 
 function storeLyrics(song, value) {
@@ -175,7 +179,7 @@ function showSetlist() {
   $('#prompter-view').hidden = true;
   $('#setlist-view').hidden = false;
   currentSong = null;
-  requestAnimationFrame(() => $('#setlist-heading').focus?.());
+  requestAnimationFrame(() => $('#setlist-view').focus());
 }
 
 function route() {
@@ -254,11 +258,16 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('hashchange', route);
 
-const initialQuery = new URL(location.href).searchParams.get('q') || '';
-$('#song-search').value = initialQuery;
-renderSongs(filterSongs(songs, initialQuery));
-$('#clear-search').hidden = !initialQuery;
-route();
+async function initialize() {
+  bundledLyrics = await loadBundledLyrics('./lyrics.json', songs.map(song => song.id));
+  const initialQuery = new URL(location.href).searchParams.get('q') || '';
+  $('#song-search').value = initialQuery;
+  renderSongs(filterSongs(songs, initialQuery));
+  $('#clear-search').hidden = !initialQuery;
+  route();
+}
+
+void initialize();
 
 if ('serviceWorker' in navigator && location.protocol === 'https:') {
   window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
