@@ -65,6 +65,10 @@ function renderSongs(list) {
     number.setAttribute('aria-hidden', 'true');
     const copy = element('span', 'song-copy');
     copy.append(element('strong', '', song.title), element('span', '', `${song.artist}${song.duration ? ` · ${song.duration}` : ''}`));
+    if (!getLyrics(song)) {
+      copy.append(element('span', 'lyrics-missing', 'Sin letra'));
+      main.setAttribute('aria-label', `Abrir ${song.title} en modo prompter, sin letra guardada`);
+    }
     const arrow = element('span', 'open-arrow', '→');
     arrow.setAttribute('aria-hidden', 'true');
     main.append(number, copy, arrow);
@@ -178,6 +182,7 @@ function showSetlist() {
   stopScroll();
   void fullscreenController.exit();
   document.title = 'LetraLista · Setlist del concierto';
+  renderSongs(filterSongs(songs, $('#song-search').value));
   $('#prompter-view').hidden = true;
   $('#setlist-view').hidden = false;
   currentSong = null;

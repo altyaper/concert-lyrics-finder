@@ -57,6 +57,7 @@ h1 { margin: 0; max-width: 840px; font-family: Georgia, "Times New Roman", serif
 .song-copy { display: flex; min-width: 0; flex-direction: column; gap: 6px; }
 .song-copy strong { overflow-wrap: anywhere; font-size: clamp(1.05rem, 2.3vw, 1.28rem); line-height: 1.2; }
 .song-copy span { color: var(--muted); line-height: 1.35; overflow-wrap: anywhere; }
+.song-copy .lyrics-missing { width: fit-content; padding: 3px 7px; color: #d8a13c; background: rgba(244,191,79,.1); border: 1px solid rgba(244,191,79,.28); border-radius: 999px; font-size: .7rem; font-weight: 800; line-height: 1; text-transform: uppercase; letter-spacing: .06em; }
 .open-arrow { color: var(--accent); font-size: 1.3rem; transition: transform .18s ease; }
 .song-card:hover .open-arrow { transform: translateX(3px); }
 .song-actions { display: flex; align-items: center; gap: 8px; padding: 0 20px 14px 82px; }

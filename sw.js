@@ -1,5 +1,5 @@
 const CACHE_PREFIX = 'letralista-shell-';
-const CACHE = `${CACHE_PREFIX}v7`;
+const CACHE = `${CACHE_PREFIX}v8`;
 const SHELL = ['./', './index.html', './styles.css', './songs.js', './lyrics.js', './lyrics.json', './auto-scroll.js', './wake-lock.js', './fullscreen.js', './app.js', './manifest.webmanifest', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'];
 
 self.addEventListener('install', event => {

@@ -33,5 +33,5 @@ test('prompter animation and offline build use the cross-browser scroll stepper'
   assert.match(app, /scrollStepper\.reset\(\)/);
   assert.match(build, /auto-scroll\.js/);
   assert.match(worker, /\.\/auto-scroll\.js/);
-  assert.match(worker, /CACHE = `\$\{CACHE_PREFIX\}v7`/);
+  assert.match(worker, /CACHE = `\$\{CACHE_PREFIX\}v8`/);
 });

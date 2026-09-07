@@ -24,7 +24,7 @@ test('setlist omits the promotional intro block while retaining an accessible fo
   assert.match(html, /<section id="setlist-view" class="view" aria-label="Setlist" tabindex="-1">/);
   assert.doesNotMatch(app, /setlist-heading/);
   assert.match(app, /\$\('#setlist-view'\)\.focus/);
-  assert.match(sw, /CACHE = `\$\{CACHE_PREFIX\}v7`/);
+  assert.match(sw, /CACHE = `\$\{CACHE_PREFIX\}v8`/);
 });
 
 test('page omits the footer copy from the refreshed offline shell', async () => {
@@ -32,7 +32,7 @@ test('page omits the footer copy from the refreshed offline shell', async () => 
   assert.doesNotMatch(html, /Hecha para cantar, no para complicarte\./i);
   assert.doesNotMatch(html, /Las letras que agregues permanecen en tu dispositivo\./i);
   assert.doesNotMatch(html, /<footer\b/i);
-  assert.match(sw, /CACHE = `\$\{CACHE_PREFIX\}v7`/);
+  assert.match(sw, /CACHE = `\$\{CACHE_PREFIX\}v8`/);
 });
 
 test('PWA metadata and service worker preserve a public static-only offline shell', async () => {
