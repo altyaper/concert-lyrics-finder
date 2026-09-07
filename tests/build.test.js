@@ -19,7 +19,7 @@ test('generated PWA icons have their declared pixel dimensions', async () => {
 });
 
 test('all bundled JavaScript parses as ECMAScript modules', async () => {
-  for (const file of ['app.js', 'songs.js', 'lyrics.js', 'wake-lock.js', 'fullscreen.js', 'sw.js']) {
+  for (const file of ['songs.js', 'lyrics.js', 'auto-scroll.js', 'wake-lock.js', 'fullscreen.js', 'app.js', 'sw.js']) {
     const text = await readFile(new URL(`../${file}`, import.meta.url), 'utf8');
     assert.ok(text.length > 100);
   }

@@ -2,6 +2,7 @@ import { songs, filterSongs, lyricSearchUrl, geniusSearchUrl } from './songs.js'
 import { createWakeLockManager } from './wake-lock.js';
 import { createFullscreenController } from './fullscreen.js';
 import { loadBundledLyrics, resolveLyrics } from './lyrics.js';
+import { createScrollStepper } from './auto-scroll.js';
 
 const $ = selector => document.querySelector(selector);
 const storageKey = song => `letralista:lyrics:${song.id}`;
@@ -12,6 +13,7 @@ let animationFrame = null;
 let lastFrame = 0;
 let fontSize = getStoredFontSize();
 let bundledLyrics = Object.create(null);
+const scrollStepper = createScrollStepper();
 const wakeLockManager = createWakeLockManager({
   isActive: () => scrolling,
   requestLock: () => navigator.wakeLock.request('screen')
@@ -213,20 +215,20 @@ function scrollFrame(time) {
   if (!lastFrame) lastFrame = time;
   const speed = Number($('#scroll-speed').value);
   const surface = $('#prompter-scroll');
-  surface.scrollTop += speed * (time - lastFrame) / 1000;
+  scrollStepper.advance(surface, speed * (time - lastFrame) / 1000);
   lastFrame = time;
   if (surface.scrollTop + surface.clientHeight >= surface.scrollHeight - 2) return stopScroll();
   animationFrame = requestAnimationFrame(scrollFrame);
 }
 
 function startScroll() {
-  scrolling = true; lastFrame = 0; updatePlayButton();
+  scrolling = true; lastFrame = 0; scrollStepper.reset(); updatePlayButton();
   if ('wakeLock' in navigator) void wakeLockManager.acquire();
   animationFrame = requestAnimationFrame(scrollFrame);
 }
 
 function stopScroll() {
-  scrolling = false; lastFrame = 0;
+  scrolling = false; lastFrame = 0; scrollStepper.reset();
   if (animationFrame) cancelAnimationFrame(animationFrame);
   animationFrame = null; updatePlayButton(); void wakeLockManager.release();
 }

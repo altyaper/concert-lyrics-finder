@@ -68,5 +68,5 @@ test('app startup, static build and PWA shell include the lyrics JSON', async ()
   assert.match(build, /lyrics\.json/);
   assert.match(worker, /\.\/lyrics\.js/);
   assert.match(worker, /\.\/lyrics\.json/);
-  assert.match(worker, /CACHE = `\$\{CACHE_PREFIX\}v6`/);
+  assert.match(worker, /CACHE = `\$\{CACHE_PREFIX\}v7`/);
 });
